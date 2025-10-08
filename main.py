@@ -1,94 +1,86 @@
-# =========================
-# 🤖 BOT DE ESCANTEIOS - VERSÃO LIMPA E ESTÁVEL
-# =========================
-
+import os
 import requests
+from telegram import Bot
+from flask import Flask
+from datetime import datetime
 import time
 
 # =========================
-# 🔧 CONFIGURAÇÕES DO BOT
+# CONFIGURAÇÕES DO BOT
 # =========================
 TELEGRAM_TOKEN = "7977015488:AAFdpmpZE-6O0V-wIJnUa5UQu3Osil-lzEI"
 CHAT_ID = "7400926391"
 API_KEY = "d6fec5cd6cmsh108e41f6f563c21p140d1fjsnaee05756c8a8"
 
-# =========================
-# 🚀 INÍCIO DO BOT
-# =========================
-print("🤖 Bot iniciado com sucesso! Aguardando novos dados...")
+bot = Bot(token=TELEGRAM_TOKEN)
 
 # =========================
-# 📤 FUNÇÃO PARA ENVIAR MENSAGEM NO TELEGRAM
+# FUNÇÕES PRINCIPAIS
 # =========================
 def enviar_mensagem(texto):
-    """Envia uma mensagem para o chat configurado no Telegram."""
-    url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    payload = {"chat_id": CHAT_ID, "text": texto}
+    """Envia mensagem para o Telegram"""
     try:
-        response = requests.post(url, json=payload)
-        if response.status_code == 200:
-            print("✅ Mensagem enviada com sucesso!")
-        else:
-            print(f"⚠️ Erro ao enviar mensagem: {response.text}")
+        bot.send_message(chat_id=CHAT_ID, text=texto)
+        print(f"✅ Mensagem enviada: {texto}")
     except Exception as e:
-        print(f"❌ Exceção ao enviar mensagem: {e}")
+        print(f"❌ Erro ao enviar mensagem: {e}")
 
-# =========================
-# ⚽ FUNÇÃO PARA BUSCAR DADOS DE ESCANTEIOS
-# =========================
 def buscar_dados_escanteios():
-    """Busca dados na API e retorna os jogos que atendem aos critérios."""
-    url = "https://api-football-v1.p.rapidapi.com/v3/fixtures"
-    headers = {
-        "x-rapidapi-key": API_KEY,
-        "x-rapidapi-host": "api-football-v1.p.rapidapi.com"
+    """Simula captura de dados de escanteios da API"""
+    # Aqui você insere seu código real para pegar dados da API
+    # Exemplo genérico:
+    dados = {
+        "time_casa": "Time A",
+        "time_fora": "Time B",
+        "escanteios": 10,
+        "tempo": 55
     }
-    params = {"live": "all"}  # Busca todos os jogos ao vivo
+    return dados
 
-    try:
-        resposta = requests.get(url, headers=headers, params=params, timeout=10)
-        dados = resposta.json()
-        jogos = dados.get("response", [])
-
-        lista_jogos = []
-        for jogo in jogos:
-            try:
-                casa = jogo["teams"]["home"]["name"]
-                fora = jogo["teams"]["away"]["name"]
-                escanteios_casa = jogo["statistics"][0]["statistics"][8]["value"]
-                escanteios_fora = jogo["statistics"][1]["statistics"][8]["value"]
-                total = escanteios_casa + escanteios_fora
-                tempo = jogo["fixture"]["status"]["elapsed"]
-
-                if total >= 8 and tempo <= 70:  # Critério de alerta
-                    lista_jogos.append(
-                        f"{casa} x {fora} ⚽\nEscanteios: {total}\nMinuto: {tempo}'"
-                    )
-
-            except Exception:
-                continue  # Ignora jogos com dados faltando
-
-        return lista_jogos
-
-    except Exception as erro:
-        print(f"❌ Erro ao buscar dados: {erro}")
-        return []
+def processar_jogo():
+    """Processa os dados e envia notificação se necessário"""
+    jogo = buscar_dados_escanteios()
+    mensagem = (
+        f"📊 Oportunidade de Escanteios!\n"
+        f"{jogo['time_casa']} x {jogo['time_fora']}\n"
+        f"Escanteios: {jogo['escanteios']}\n"
+        f"Minuto: {jogo['tempo']}'"
+    )
+    enviar_mensagem(mensagem)
 
 # =========================
-# 🔁 LOOP PRINCIPAL DO BOT
+# INICIO DO BOT
 # =========================
-try:
+enviar_mensagem("🤖 Bot iniciado com sucesso! Rodando no Render gratuito.")
+
+# =========================
+# LOOP PRINCIPAL (simulação)
+# =========================
+def loop_principal():
     while True:
-        print("🔍 Verificando novos jogos...")
-        jogos = buscar_dados_escanteios()
+        try:
+            processar_jogo()
+            time.sleep(60)  # espera 1 minuto antes de verificar novamente
+        except Exception as e:
+            print(f"❌ Erro no loop principal: {e}")
+            time.sleep(60)
 
-        if jogos:
-            for jogo in jogos:
-                enviar_mensagem(f"📊 Oportunidade de Escanteios:\n{jogo}")
-        else:
-            print("⏳ Nenhum jogo com critérios encontrados no momento.")
+# =========================
+# CONFIGURAÇÃO DE PORTA PARA RENDER
+# =========================
+app = Flask(_name_)
 
-        time.sleep(60)  # Aguarda 1 minuto antes de buscar novamente
+@app.route("/")
+def home():
+    return "Bot rodando!"
 
-except Exception as e:
-    print(f"🚨 Erro geral no bot: {e}")
+if _name_ == "_main_":
+    import threading
+
+    # Roda o bot em thread separada
+    bot_thread = threading.Thread(target=loop_principal)
+    bot_thread.start()
+
+    # Roda o Flask só pra abrir porta
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
