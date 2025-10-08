@@ -1,43 +1,47 @@
 import os
 import requests
+from telegram import _version_ as ptb_version
 from telegram import Bot
+from telegram.ext import ApplicationBuilder
 from flask import Flask
-from datetime import datetime
+import asyncio
+import threading
 import time
+
+print(f"🔹 Rodando python-telegram-bot versão {ptb_version}")
 
 # =========================
 # CONFIGURAÇÕES DO BOT
 # =========================
-TELEGRAM_TOKEN = "7977015488:AAFdpmpZE-6O0V-wIJnUa5UQu3Osil-lzEI"
-CHAT_ID = "7400926391"
-API_KEY = "d6fec5cd6cmsh108e41f6f563c21p140d1fjsnaee05756c8a8"
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+CHAT_ID = os.environ.get("CHAT_ID")
+API_KEY = os.environ.get("API_KEY")
 
 bot = Bot(token=TELEGRAM_TOKEN)
 
 # =========================
 # FUNÇÕES PRINCIPAIS
 # =========================
-def enviar_mensagem(texto):
+async def enviar_mensagem(texto):
     """Envia mensagem para o Telegram"""
     try:
-        bot.send_message(chat_id=CHAT_ID, text=texto)
+        await bot.send_message(chat_id=CHAT_ID, text=texto)
         print(f"✅ Mensagem enviada: {texto}")
     except Exception as e:
         print(f"❌ Erro ao enviar mensagem: {e}")
 
 def buscar_dados_escanteios():
     """Simula captura de dados de escanteios da API"""
-    # Aqui você insere seu código real para pegar dados da API
-    # Exemplo genérico:
     dados = {
         "time_casa": "Time A",
         "time_fora": "Time B",
         "escanteios": 10,
         "tempo": 55
     }
+    print(f"🔹 Dados recebidos: {dados}")
     return dados
 
-def processar_jogo():
+async def processar_jogo():
     """Processa os dados e envia notificação se necessário"""
     jogo = buscar_dados_escanteios()
     mensagem = (
@@ -46,24 +50,19 @@ def processar_jogo():
         f"Escanteios: {jogo['escanteios']}\n"
         f"Minuto: {jogo['tempo']}'"
     )
-    enviar_mensagem(mensagem)
+    await enviar_mensagem(mensagem)
 
 # =========================
-# INICIO DO BOT
+# LOOP PRINCIPAL
 # =========================
-enviar_mensagem("🤖 Bot iniciado com sucesso! Rodando no Render gratuito.")
-
-# =========================
-# LOOP PRINCIPAL (simulação)
-# =========================
-def loop_principal():
+async def loop_principal():
     while True:
         try:
-            processar_jogo()
-            time.sleep(60)  # espera 1 minuto antes de verificar novamente
+            await processar_jogo()
+            await asyncio.sleep(60)  # espera 1 minuto
         except Exception as e:
             print(f"❌ Erro no loop principal: {e}")
-            time.sleep(60)
+            await asyncio.sleep(60)
 
 # =========================
 # CONFIGURAÇÃO DE PORTA PARA RENDER
@@ -75,12 +74,7 @@ def home():
     return "Bot rodando!"
 
 if _name_ == "_main_":
-    import threading
-
-    # Roda o bot em thread separada
-    bot_thread = threading.Thread(target=loop_principal)
-    bot_thread.start()
-
-    # Roda o Flask só pra abrir porta
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    # Roda o Flask numa thread separada
+    threading.Thread(target=lambda: app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))).start()
+    # Roda o loop principal de forma assíncrona
+    asyncio.run(loop_principal())
