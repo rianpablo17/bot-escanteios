@@ -1,26 +1,22 @@
 #!/bin/bash
-set -e  # Para o script parar se algum comando falhar
+set -e
 
-echo "🔹 Instalando Python 3.11..."
-# Instala o Python 3.11 via apt-get (Render roda Debian/Ubuntu)
-sudo apt-get update
-sudo apt-get install -y python3.11 python3.11-venv python3.11-dev python3-pip
+echo "🔹 Usando Python 3.11.9 definido pelo .python-version"
 
-# Define o Python 3.11 como padrão no script
-alias python=python3.11
-alias pip=pip3
-
-echo "🔹 Versão do Python: $(python --version)"
-echo "🔹 Versão do pip: $(pip --version)"
-
-# Cria um ambiente virtual (opcional, mas recomendado)
-python -m venv .venv
-source .venv/bin/activate
+# Ativa o ambiente virtual se existir
+if [ -d ".venv" ]; then
+  echo "🔹 Ativando ambiente virtual existente..."
+  source .venv/bin/activate
+else
+  echo "🔹 Criando novo ambiente virtual..."
+  python3.11 -m venv .venv
+  source .venv/bin/activate
+fi
 
 # Atualiza pip dentro do venv
 pip install --upgrade pip
 
-# Instala dependências do bot
+# Instala dependências
 echo "🔹 Instalando dependências..."
 pip install -r requirements.txt
 
