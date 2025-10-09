@@ -1,80 +1,39 @@
-import os
-import requests
-from telegram import _version_ as ptb_version
-from telegram import Bot
-from telegram.ext import ApplicationBuilder
-from flask import Flask
-import asyncio
-import threading
-import time
+# main.py
 
-print(f"🔹 Rodando python-telegram-bot versão {ptb_version}")
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+import logging
 
-# =========================
-# CONFIGURAÇÕES DO BOT
-# =========================
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
-CHAT_ID = os.environ.get("CHAT_ID")
-API_KEY = os.environ.get("API_KEY")
+# Configuração do logging para rastrear erros
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
 
-bot = Bot(token=TELEGRAM_TOKEN)
+# Token do bot (substitua pelo seu token real)
+TOKEN = "SEU_TOKEN_AQUI"
 
-# =========================
-# FUNÇÕES PRINCIPAIS
-# =========================
-async def enviar_mensagem(texto):
-    """Envia mensagem para o Telegram"""
-    try:
-        await bot.send_message(chat_id=CHAT_ID, text=texto)
-        print(f"✅ Mensagem enviada: {texto}")
-    except Exception as e:
-        print(f"❌ Erro ao enviar mensagem: {e}")
+# Função para o comando /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text("Olá! Bot de escanteios ativado! 🚀")
 
-def buscar_dados_escanteios():
-    """Simula captura de dados de escanteios da API"""
-    dados = {
-        "time_casa": "Time A",
-        "time_fora": "Time B",
-        "escanteios": 10,
-        "tempo": 55
-    }
-    print(f"🔹 Dados recebidos: {dados}")
-    return dados
+# Função para o comando /help
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text("Use este bot para receber notificações de escanteios.")
 
-async def processar_jogo():
-    """Processa os dados e envia notificação se necessário"""
-    jogo = buscar_dados_escanteios()
-    mensagem = (
-        f"📊 Oportunidade de Escanteios!\n"
-        f"{jogo['time_casa']} x {jogo['time_fora']}\n"
-        f"Escanteios: {jogo['escanteios']}\n"
-        f"Minuto: {jogo['tempo']}'"
-    )
-    await enviar_mensagem(mensagem)
+# Função principal para rodar o bot
+def main():
+    # Cria a aplicação do bot
+    app = ApplicationBuilder().token(TOKEN).build()
 
-# =========================
-# LOOP PRINCIPAL
-# =========================
-async def loop_principal():
-    while True:
-        try:
-            await processar_jogo()
-            await asyncio.sleep(60)  # espera 1 minuto
-        except Exception as e:
-            print(f"❌ Erro no loop principal: {e}")
-            await asyncio.sleep(60)
+    # Adiciona os handlers de comando
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("help", help_command))
 
-# =========================
-# CONFIGURAÇÃO DE PORTA PARA RENDER
-# =========================
-app = Flask(_name_)
+    # Inicia o bot
+    print("Bot iniciado...")
+    app.run_polling()
 
-@app.route("/")
-def home():
-    return "Bot rodando!"
-
-if _name_ == "_main_":
-    # Roda o Flask numa thread separada
-    threading.Thread(target=lambda: app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))).start()
-    # Roda o loop principal de forma assíncrona
-    asyncio.run(loop_principal())
+# Ponto de entrada do script
+if __name__ == "__main__":
+    main()
