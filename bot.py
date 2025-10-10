@@ -325,5 +325,5 @@ def main_loop():
     except KeyboardInterrupt:
         print("Bot interrompido.")
 
-if __name_ == "__main_":
+if __name_ == "__main__":
     main_loop()
