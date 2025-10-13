@@ -61,7 +61,7 @@ def safe_get(url, params=None):
 # Recomendo colar exatamente como estão, apenas removendo o loop while.
 
 # ========== FLASK + TELEGRAM ==========
-app = Flask(_name_)
+app = Flask(__name__)
 application = Application.builder().token(TOKEN).build()
 
 # Exemplo comando /start
