@@ -152,15 +152,11 @@ if __name__ == "__main__":
     # Inicia monitoramento em thread separada
     threading.Thread(target=monitor_loop, daemon=True).start()
 
-    # Configura webhook no Telegram (substitua SEU_SERVICO pelo seu domínio do Render)
-    URL = f"https://SEU_SERVICO.onrender.com/{TELEGRAM_BOT_TOKEN}"
+    # Configura webhook no Telegram
+    URL = f"https://SEU_SERVICO.onrender.com/{TELEGRAM_BOT_TOKEN}"  # substitua aqui com sua URL do Render
     import asyncio
-
-async def setup_webhook():
-    await bot.delete_webhook()
-    await bot.set_webhook(URL)
-
-asyncio.run(setup_webhook())
+    asyncio.run(bot.delete_webhook())
+    asyncio.run(bot.set_webhook(URL))
 
     # Inicia Flask
     port = int(os.environ.get("PORT", 5000))
