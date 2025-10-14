@@ -1,9 +1,11 @@
-# bot.py - Bot de escanteios pronto para Render
+# bot.py - Bot de escanteios pronto para Render com keep-alive
 
 import os
 import logging
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
+from threading import Thread
+from http.server import SimpleHTTPRequestHandler, HTTPServer
 
 # -----------------------------
 # CONFIGURAÇÃO DE LOG
@@ -28,6 +30,16 @@ if CHAT_ID:
         CHAT_ID = int(CHAT_ID)
     except ValueError:
         raise ValueError("⚠️ CHAT_ID inválido! Deve ser um número inteiro.")
+
+# -----------------------------
+# FUNÇÃO KEEP-ALIVE PARA RENDER / UPTIMEROBOT
+# -----------------------------
+def keep_alive():
+    server = HTTPServer(("0.0.0.0", 10000), SimpleHTTPRequestHandler)
+    server.serve_forever()
+
+# Inicia o keep-alive em uma thread separada
+Thread(target=keep_alive, daemon=True).start()
 
 # -----------------------------
 # HANDLERS
