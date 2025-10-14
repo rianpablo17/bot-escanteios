@@ -103,5 +103,5 @@ def run_telegram_bot_and_monitor():
 
     monitor_loop(target_chat_id)
 
-if __name_== '__main__':
+if __name__== '__main__':
     run_telegram_bot_and_monitor()
