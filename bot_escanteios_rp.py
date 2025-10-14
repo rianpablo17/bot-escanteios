@@ -17,7 +17,7 @@ TARGET_CHAT_ID = os.getenv("TARGET_CHAT_ID")
 POLL_INTERVAL = int(os.getenv("POLL_INTERVAL", 30))  # tempo de checagem em segundos
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
-app = Flask(_name_)
+app = Flask(__name__)
 
 sent_signals = set()
 lock = threading.Lock()
