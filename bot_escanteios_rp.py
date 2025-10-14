@@ -26,7 +26,7 @@ if not TELEGRAM_BOT_TOKEN or not API_FOOTBALL_KEY:
     raise RuntimeError("VERIFIQUE: TELEGRAM_BOT_TOKEN e API_FOOTBALL_KEY precisam estar no .env")
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
-app = Flask(_name_)
+app = Flask(__name__)
 
 API_BASE = "https://v3.football.api-sports.io"
 HEADERS = {"x-apisports-key": API_FOOTBALL_KEY}
