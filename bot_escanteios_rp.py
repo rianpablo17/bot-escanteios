@@ -78,4 +78,4 @@ def build_message(fixture, strategy):
     msg += f"🏟 Jogo: {home} vs {away}\n"
     msg += f"🏆 Competição: {competition}\n"
     msg += f"⏱ Tempo: {minute}'\n"
-    msg += f"⚽ Placar: {score
+    msg += f"⚽ Placar: {score}\n"
