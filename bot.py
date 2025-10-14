@@ -9,7 +9,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
 # ========== CONFIGURAÇÃO ==========
-TOKEN = os.getenv("7977015488:AAGuGOSA6TfQeH-wrhacIr6Tj1EYW3CXPg4")  # defina no Render
+TOKEN = os.getenv("7977015488:AAHwZgsAy8lcLBYpB2yWSQcx5UD8JW5wUtM")  # defina no Render
 CHAT_ID = os.getenv("7400926391")  # defina no Render
 
 API_KEY = os.getenv("d6fec5cd6cmsh108e41f6f563c21p140d1fjsnaee05756c8a8")  # API-Football
