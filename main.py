@@ -11,7 +11,7 @@ logging.basicConfig(
 )
 
 # Token do bot (substitua pelo seu token real)
-TOKEN = "7977015488:AAHwZgsAy8lcLBYpB2yWSQcx5UD8JW5wUtM"
+TOKEN = "TOKEN"
 
 # Função para o comando /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
