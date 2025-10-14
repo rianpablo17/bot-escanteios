@@ -22,7 +22,8 @@ import time
 import requests
 import threading
 from dotenv import load_dotenv
-from telegram import Bot, ParseMode
+from telegram import Bot
+from telegram.constants import ParseMode  # linha nova
 from telegram.ext import Updater, CommandHandler
 
 load_dotenv()
