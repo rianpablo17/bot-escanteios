@@ -79,3 +79,84 @@ def build_message(fixture, strategy):
     msg += f"🏆 Competição: {competition}\n"
     msg += f"⏱ Tempo: {minute}'\n"
     msg += f"⚽ Placar: {score}\n"
+    msg += f"⛳ Escanteios: {fixture['corners']['home']} - {fixture['corners']['away']}\n"
+    msg += f"➡ Detalhes: ⚠️ Entrada em ESCANTEIOS ASIÁTICOS\n"
+    msg += f"https://www.bet365.com/#/AC/B1/C1/D13/E{fixture['fixture']['id']}/F2/"
+    return msg
+
+def evaluate_fixture(fixture):
+    minute = fixture["fixture"]["status"]["elapsed"]
+    corners_home = fixture["corners"]["home"]
+    corners_away = fixture["corners"]["away"]
+
+    # Estratégias: HT (33-38) e FT (83-87) alta chance 1-2 escanteios
+    total_corners = corners_home + corners_away
+    if 33 <= minute <= 38 and total_corners <= 2:
+        return "HT - Alta Chance de Cantos"
+    elif 83 <= minute <= 87 and total_corners <= 2:
+        return "FT - Alta Chance de Cantos"
+    return None
+
+def monitor_loop():
+    while True:
+        try:
+            fixtures = fetch_live_fixtures()
+            for fix in fixtures:
+                try:
+                    strategy = evaluate_fixture(fix)
+                    if strategy:
+                        fixture_id = fix["fixture"]["id"]
+                        key = f"{fixture_id}:{strategy}"
+                        with lock:
+                            if key in sent_signals:
+                                continue
+                            sent_signals.add(key)
+
+                        msg = build_message(fix, strategy)
+                        if TARGET_CHAT_ID:
+                            bot.send_message(chat_id=int(TARGET_CHAT_ID), text=msg, parse_mode=ParseMode.MARKDOWN)
+                        else:
+                            print(msg)
+                except Exception as e:
+                    print("Erro avaliando partida:", e)
+        except Exception as e:
+            print("Erro no loop principal:", e)
+        time.sleep(POLL_INTERVAL)
+
+# -------------------------
+# Webhook Flask
+# -------------------------
+@app.route(f"/{TELEGRAM_BOT_TOKEN}", methods=["POST"])
+def webhook():
+    update = Update.de_json(request.get_json(force=True), bot)
+    application.process_update(update)
+    return "OK"
+
+@app.route("/")
+def index():
+    return "Bot ESCANTEIOS RP ativo!"
+
+# -------------------------
+# Setup Telegram
+# -------------------------
+application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
+application.add_handler(CommandHandler("start", start))
+application.add_handler(CommandHandler("id", get_chat_id))
+
+# -------------------------
+# Main
+# -------------------------
+if __name__ == "__main__":
+    import threading
+
+    # Inicia monitoramento em thread separada
+    threading.Thread(target=monitor_loop, daemon=True).start()
+
+    # Configura webhook no Telegram (substitua SEU_SERVICO pelo seu domínio do Render)
+    URL = f"https://SEU_SERVICO.onrender.com/{TELEGRAM_BOT_TOKEN}"
+    bot.delete_webhook()
+    bot.set_webhook(URL)
+
+    # Inicia Flask
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
