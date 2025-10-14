@@ -154,8 +154,13 @@ if __name__ == "__main__":
 
     # Configura webhook no Telegram (substitua SEU_SERVICO pelo seu domínio do Render)
     URL = f"https://SEU_SERVICO.onrender.com/{TELEGRAM_BOT_TOKEN}"
-    bot.delete_webhook()
-    bot.set_webhook(URL)
+    import asyncio
+
+async def setup_webhook():
+    await bot.delete_webhook()
+    await bot.set_webhook(URL)
+
+asyncio.run(setup_webhook())
 
     # Inicia Flask
     port = int(os.environ.get("PORT", 5000))
