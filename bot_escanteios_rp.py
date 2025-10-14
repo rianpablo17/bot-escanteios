@@ -1,4 +1,7 @@
 import os
+print("Token atual:", os.getenv('7977015488:AAHwZgsAy8lcLBYpB2yWSQcx5UD8JW5wUtM'))
+exit()
+import os
 import time
 import requests
 import threading
