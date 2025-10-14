@@ -12,7 +12,7 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
-logger = logging.getLogger(_name_)
+logger = logging.getLogger(__name__)
 
 # -----------------------------
 # VARIÁVEIS DE AMBIENTE
@@ -55,5 +55,5 @@ def main():
     logger.info("Bot iniciado com sucesso 🚀")
     application.run_polling()
 
-if __name_ == "__main__":
+if __name__ == "__main__":
     main()
