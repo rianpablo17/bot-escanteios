@@ -27,7 +27,7 @@ if not TOKEN:
 # -----------------------------
 # INICIALIZA O BOT
 # -----------------------------
-app = Flask(_name_)
+app = Flask(__name__)
 application = Application.builder().token(TOKEN).build()
 
 # -----------------------------
