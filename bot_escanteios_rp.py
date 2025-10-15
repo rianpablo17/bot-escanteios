@@ -122,10 +122,13 @@ def monitor_loop():
 # -------------------------
 @app.route(f"/{TELEGRAM_BOT_TOKEN}", methods=["POST"])
 def webhook():
-    json_update = request.get_json(force=True)
-    update = Update.de_json(json_update, bot)
-    # Executa o processamento de forma assíncrona
-    application.create_task(application.process_update(update))
+    try:
+        json_update = request.get_json(force=True)
+        update = Update.de_json(json_update, bot)
+        # processa o update corretamente (executa a coroutine num loop temporário)
+        asyncio.run(application.process_update(update))
+    except Exception as e:
+        print("Erro no webhook:", e)
     return "OK"
 
 @app.route("/")
