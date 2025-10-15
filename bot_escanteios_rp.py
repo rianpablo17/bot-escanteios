@@ -5,7 +5,8 @@ import logging
 import asyncio
 import requests
 from flask import Flask, request
-from telegram import Update, ParseMode
+from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import Application, CommandHandler, ContextTypes
 
 # -----------------------------
