@@ -335,9 +335,12 @@ def process_fixtures_and_send():
                 logger.info('Sinal enviado para fixture %s window %s (p1=%.2f p2=%.2f)', fixture_id, window_key, metrics['p_ge_1'], metrics['p_ge_2'])
 
 
-if __name__ == '__main__':
-    # loop principal (rodar em background no Render como worker ou similar)
-    logger.info('Bot de escanteios v2 iniciado')
+from threading import Thread
+from flask import Flask
+import os
+
+# Loop do bot
+def start_loop():
     try:
         while True:
             try:
@@ -347,3 +350,19 @@ if __name__ == '__main__':
             time.sleep(POLL_INTERVAL)
     except KeyboardInterrupt:
         logger.info('Interrompido pelo usuário')
+
+# Webserver mínimo para satisfazer o Render
+app = Flask('bot_health')
+
+@app.route("/healthz")
+def health():
+    return "ok", 200
+
+if __name__ == '__main__':
+    # inicia loop do bot em segundo plano
+    Thread(target=start_loop, daemon=True).start()
+    
+    # inicia webserver na porta do Render
+    port = int(os.getenv('PORT', '10000'))
+    logger.info('Iniciando webserver de health na porta %s', port)
+    app.run(host='0.0.0.0', port=port)
