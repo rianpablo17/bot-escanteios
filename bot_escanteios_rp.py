@@ -141,4 +141,4 @@ def receive_update():
 # INÍCIO 
 # -----------------------------
 if __name__ == "__main__":
-    logger.info("🚀 Iniciando bot com Flask +
+    logger.info("🚀 Iniciando bot com Flask + Webhook + sinais ao vivo HT/FT...")
