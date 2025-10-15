@@ -143,3 +143,14 @@ def receive_update():
 # -----------------------------
 if __name__ == "__main__":
     logger.info("🚀 Iniciando bot com Flask + Webhook + sinais ao vivo HT/FT...")
+
+    # Inicia a task de sinais ao vivo
+    asyncio.get_event_loop().create_task(enviar_sinais_ao_vivo())
+
+    # Apenas webhook do Telegram (Flask já incluso)
+    application.run_webhook(
+        listen="0.0.0.0",
+        port=int(os.environ.get("PORT", 10000)),
+        url_path=TOKEN,
+        webhook_url=WEBHOOK_URL
+    )
