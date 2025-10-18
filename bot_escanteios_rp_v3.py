@@ -3,7 +3,7 @@ bot_escanteios_rp_v3_final.py
 Versão final adaptada: sinais inteligentes HT/FT baseados em pressão ofensiva
 - 1 sinal por tempo
 - Apenas link Bet365
-- Janela estratégica HT 35–40 / FT 80–90
+- Janela estratégica HT 33–40 / FT 80–90
 - Heurística de pressão ofensiva priorizada sobre número de escanteios
 """
 
@@ -24,7 +24,7 @@ TOKEN = os.getenv('TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 API_FOOTBALL_KEY = os.getenv('API_FOOTBALL_KEY')
 
-HT_WINDOW_MIN_START = 35
+HT_WINDOW_MIN_START = 33
 HT_WINDOW_MIN_END = 40
 FT_WINDOW_MIN_START = 80
 FT_WINDOW_MIN_END = 90
@@ -33,7 +33,7 @@ PROB_THRESHOLD_HIGH = 0.60
 PROB_THRESHOLD_2C = 0.55
 
 PRESSURE_ATTACKS_DIFF = 5
-PRESSURE_ATTACKS_ABS = 8
+PRESSURE_ATTACKS_ABS = 6
 PRESSURE_DANGEROUS_ABS = 5
 PRESSURE_DANGEROUS_DIFF = 3
 
