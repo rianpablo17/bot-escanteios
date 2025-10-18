@@ -254,17 +254,39 @@ def process_fixtures_and_send():
 
     for fixture in fixtures:
         fixture_id = fixture['fixture']['id']
+
+        # ✅ Corrige delay da API adicionando 1 minuto
+        event_minute = fixture['fixture'].get('status', {}).get('elapsed', 0) + 1
+
         metrics_per_window = compute_match_score(fixture)
         for window_key, metrics in metrics_per_window.items():
+            # Ajusta minuto com correção
+            metrics['minute'] = event_minute
+
             send_for_1 = metrics['p_ge_1'] >= PROB_THRESHOLD_HIGH
             send_for_2 = metrics['p_ge_2'] >= PROB_THRESHOLD_2C
             already_sent_key = f"{window_key}:{'2' if send_for_2 else '1'}"
+
             if (send_for_2 or send_for_1) and already_sent_key not in sent_signals[fixture_id]:
                 text = build_signal_text(fixture, window_key, metrics)
                 send_telegram_message(text)
                 sent_signals[fixture_id].add(already_sent_key)
-                logger.info('Sinal enviado para fixture %s window %s (p1=%.2f p2=%.2f)',
-                            fixture_id, window_key, metrics['p_ge_1'], metrics['p_ge_2'])
+                logger.info(
+                    'Sinal enviado para fixture %s window %s (p1=%.2f p2=%.2f)',
+                    fixture_id, window_key, metrics['p_ge_1'], metrics['p_ge_2']
+                )
+
+# ✅ Reduz tempo entre checagens para 5 segundos
+def start_loop():
+    try:
+        while True:
+            try:
+                process_fixtures_and_send()
+            except Exception as e:
+                logger.exception('Erro no loop de processamento: %s', e)
+            time.sleep(5)  # polling mais rápido, reduz delay
+    except KeyboardInterrupt:
+        logger.info('Interrompido pelo usuário')
 
 
 def start_loop():
